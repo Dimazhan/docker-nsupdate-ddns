@@ -25,7 +25,7 @@ def add_records(records):
 
         update = dns.update.Update(config['DOMAIN'], keyring=keyring)
         update.add(hostname, int(config['DNS_RECORD_TTL']), rrtype, ip)
-        dns.query.tcp(update, config['NAMESERVER'], timeout=2)
+        dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
 
 
 def delete_records(records):
@@ -36,7 +36,7 @@ def delete_records(records):
 
         update = dns.update.Update(config['DOMAIN'], keyring=keyring)
         update.delete(hostname)
-        dns.query.tcp(update, config['NAMESERVER'], timeout=2)
+        dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
 
 
 def init(_config):

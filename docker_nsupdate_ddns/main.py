@@ -33,6 +33,7 @@ def check_required_vars(_config):
     required_vars = [
         'DOMAIN',
         'NAMESERVER',
+        'PORT',
         'TSIG_NAME',
         'DOCKER_SOCKET',
         'HOSTNAME_LABEL',
