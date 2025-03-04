@@ -14,25 +14,25 @@ def add_records(records):
     keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: config['TSIG_KEY']})
 
     for hostname, ip in records.items():
-        LOG.info(f"Adding record for {hostname}({ip})")
+        LOG.info(f"Adding record for {hostname}({ip['IPv4'], ip['IPv6']})")
 
-        rrtype = "A"
-        address = ipaddress.ip_address(ip)
-        if isinstance(address, ipaddress.IPv4Address):
+        for proto, addr in ip.items():
             rrtype = "A"
-        if isinstance(address, ipaddress.IPv6Address):
-            rrtype = "AAAA"
+            if proto == 'IPv4':
+                rrtype = "A"
+            if proto == 'IPv6':
+                rrtype = "AAAA"
 
-        update = dns.update.Update(config['DOMAIN'], keyring=keyring)
-        update.add(hostname, int(config['DNS_RECORD_TTL']), rrtype, ip)
-        dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+            update = dns.update.Update(config['DOMAIN'], keyring=keyring)
+            update.add(hostname, int(config['DNS_RECORD_TTL']), rrtype, addr)
+            dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
 
 
 def delete_records(records):
     keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: config['TSIG_KEY']})
 
     for hostname, ip in records.items():
-        LOG.info(f"Deleting record for {hostname}({ip})")
+        LOG.info(f"Deleting record for {hostname}({ip['IPv4'], ip['IPv6']})")
 
         update = dns.update.Update(config['DOMAIN'], keyring=keyring)
         update.delete(hostname)

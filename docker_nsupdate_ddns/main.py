@@ -8,7 +8,7 @@ from docker_nsupdate_ddns.lib import *
 import logging
 
 config = {}
-ipam4_old = {}
+ipam_old = {}
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s [%(levelname)s] %(message)s')
 LOG = logging.getLogger(__name__)
@@ -68,17 +68,17 @@ def check_required_vars(_config):
 
 def loop():
     container.init(config)
-    ipam4 = container.generate_container_list()
-    global ipam4_old
+    ipam = container.generate_container_list()
+    global ipam_old
 
-    additions4 = determine_additions(ipam4, ipam4_old)
-    deletions4 = determine_deletions(ipam4, ipam4_old)
+    additions = determine_additions(ipam, ipam_old)
+    deletions = determine_deletions(ipam, ipam_old)
 
     nsupdate.init(config)
-    nsupdate.delete_records(deletions4)
-    nsupdate.add_records(additions4)
+    nsupdate.delete_records(deletions)
+    nsupdate.add_records(additions)
 
-    ipam4_old = ipam4
+    ipam_old = ipam
 
 
 def get_config():

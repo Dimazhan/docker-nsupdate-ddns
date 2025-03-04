@@ -29,15 +29,20 @@ def get_container_ip(container):
      - First found network
      - Fall back to ['NetworkSettings']['IPAddress']
     """
-    x = container.attrs['NetworkSettings']['IPAddress']
+    x = {}
+
+    x['IPv4'] = container.attrs['NetworkSettings']['IPAddress']
+    x['IPv6'] = container.attrs['NetworkSettings']['GlobalIPv6Address']
 
     if next(iter(container.attrs['NetworkSettings']['Networks'])):
         network_name = next(
             iter(container.attrs['NetworkSettings']['Networks']))
-        x = container.attrs['NetworkSettings']['Networks'][network_name]['IPAddress']
+        x['IPv4'] = container.attrs['NetworkSettings']['Networks'][network_name]['IPAddress']
+        x['IPv6'] = container.attrs['NetworkSettings']['Networks'][network_name]['GlobalIPv6Address']
 
     if config['DEFAULT_NETWORK'] in container.attrs['NetworkSettings']['Networks']:
-        x = container.attrs['NetworkSettings']['Networks'][config['DEFAULT_NETWORK']]['IPAddress']
+        x['IPv4'] = container.attrs['NetworkSettings']['Networks'][config['DEFAULT_NETWORK']]['IPAddress']
+        x['IPv6'] = container.attrs['NetworkSettings']['Networks'][config['DEFAULT_NETWORK']]['GlobalIPv6Address']
 
     return x
 
@@ -46,7 +51,7 @@ def generate_container_list():
     client = docker.from_env()
 
     container_list = client.containers.list()
-    ipam4 = {}
+    ipam = {}
 
     for container in container_list:
         if config['IGNORE_LABEL'] in container.attrs['Config']['Labels']:
@@ -56,9 +61,9 @@ def generate_container_list():
         container_name = get_container_name(container)
         container_ip = get_container_ip(container)
         if container_ip:
-            ipam4[container_name] = container_ip
+            ipam[container_name] = container_ip
 
-    return ipam4
+    return ipam
 
 
 def init(_config):
