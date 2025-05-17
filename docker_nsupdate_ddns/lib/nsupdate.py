@@ -15,7 +15,7 @@ def add_records(records):
     keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: config['TSIG_KEY']})
 
     for hostname, ip in records.items():
-        delete_records({hostname:None})
+        delete_records({hostname:ip})
         LOG.info(f"Adding record for {hostname}({ip['IPv4'], ip['IPv6']})")
 
         for proto, addr in ip.items():
