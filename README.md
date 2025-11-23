@@ -27,6 +27,7 @@ The names of the environment variables is the same as in the config file. Enviro
 | DEFAULT_NETWORK  | No       |                                       | Preferred network name to find IP for, in case there are multiple networks.                                                                                                                                                                             |
 | REFRESH_INTERVAL | No       | 60                                    | Interval between checks for container changes (seconds).                                                                                                                                                                                                |
 | ONE_SHOT         | No       | False                                 | Run once and exit instead of continuously monitoring.                                                                                                                                                                                                   |
+| CHECK_RECORDS    | No       | False                                 | Check DNS records.                                                                                                                                                                                                                                      |
 
 ### Environment variables
 ```bash

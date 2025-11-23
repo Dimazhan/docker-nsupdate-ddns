@@ -3,6 +3,7 @@ import logging
 import dns.update
 import dns.query
 import dns.rdatatype
+import dns.resolver
 import dns.reversename
 import dns.tsigkeyring
 
@@ -67,6 +68,30 @@ def delete_records(records):
                     update = dns.update.Update(config['REVERSE6_DOMAIN'], keyring=keyring)
                     update.delete(reventry)
                     dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+
+
+def check_records(hostname, ip):
+    ret = False
+    for proto, addr in ip.items():
+        if proto == 'IPv4':
+            rrtype = dns.rdatatype.A
+        if proto == 'IPv6':
+            rrtype = dns.rdatatype.AAAA
+
+        resolver = dns.resolver.Resolver()
+        target_domain = hostname + '.' + config['DOMAIN'] + '.'
+        try:
+            answers = resolver.resolve(target_domain, rrtype)
+            for rdata in answers:
+                if str(rdata) == str(addr):
+                    ret = True
+        except dns.resolver.NoAnswer:
+            LOG.error(f"No {proto} records found for {target_domain}")
+        except dns.resolver.NXDOMAIN:
+            LOG.error(f"Domain {target_domain} does not exist")
+        except Exception as e:
+            LOG.error(f"An error occurred: {e}")
+    return ret
 
 
 def init(_config):

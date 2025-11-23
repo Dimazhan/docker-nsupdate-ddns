@@ -41,7 +41,8 @@ def check_required_vars(_config):
         'DNS_RECORD_TTL',
         'DEFAULT_NETWORK',
         'REFRESH_INTERVAL',
-        'ONE_SHOT'
+        'ONE_SHOT',
+        'CHECK_RECORDS'
     ]
     missing_vars = []
     for item in required_vars:
@@ -94,7 +95,7 @@ def get_config():
 
 
 def determine_additions(ipam, ipam_old):
-    return {k: v for k, v in ipam.items() if k not in ipam_old}
+    return {k: v for k, v in ipam.items() if (k not in ipam_old) or (eval(config['CHECK_RECORDS']) and not nsupdate.check_records(k, v))}
 
 
 def determine_deletions(ipam, ipam_old):
