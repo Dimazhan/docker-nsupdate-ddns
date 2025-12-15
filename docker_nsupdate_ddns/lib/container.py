@@ -57,6 +57,9 @@ def generate_container_list():
         if config['IGNORE_LABEL'] in container.attrs['Config']['Labels']:
             LOG.debug(f"Ignoring container {container.attrs['Name']} as ignore label present")
             continue
+        if eval(config['DEFAULT_IGNORE']) and not config['USE_LABEL'] in container.attrs['Config']['Labels']:
+            LOG.debug(f"Ignoring container {container.attrs['Name']} by use label not present")
+            continue
 
         container_name = get_container_name(container)
         container_ip = get_container_ip(container)

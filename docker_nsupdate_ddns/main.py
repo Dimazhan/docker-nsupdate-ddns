@@ -38,6 +38,8 @@ def check_required_vars(_config):
         'DOCKER_SOCKET',
         'HOSTNAME_LABEL',
         'IGNORE_LABEL',
+        'USE_LABEL',
+        'DEFAULT_IGNORE',
         'DNS_RECORD_TTL',
         'DEFAULT_NETWORK',
         'REFRESH_INTERVAL',

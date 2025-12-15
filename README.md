@@ -23,6 +23,8 @@ The names of the environment variables is the same as in the config file. Enviro
 | DOCKER_SOCKET    | No       | /var/run/docker.sock                  | Sets the location of the Docker socket.                                                                                                                                                                                                                 |
 | HOSTNAME_LABEL   | No       | nl.mtak.docker-nsupdate-ddns.hostname | Docker label to override the default record name with. Use with `docker --label=nl.mtak.docker-nsupdate-ddns.hostname=nginx` to get `nginx.int.mtak.nl` _If the label value present on the container, use it as hostname otherwise the container name._ |
 | IGNORE_LABEL     | No       | nl.mtak.docker-nsupdate-ddns.ignore   | Container label to exclude containers from DNS updates.                                                                                                                                                                                                 |
+| USE_LABEL        | No       | nl.mtak.docker-nsupdate-ddns.use      | Container label to include containers for DNS updates.                                                                                                                                                                                                  |
+| DEFAULT_IGNORE   | No       | False                                 | Ignore container by default, if the USE_LABEL label is not specified.                                                                                                                                                                                   |
 | DNS_RECORD_TTL   | No       | 60                                    | Time to Live (TTL) for DNS records (seconds).                                                                                                                                                                                                           |
 | DEFAULT_NETWORK  | No       |                                       | Preferred network name to find IP for, in case there are multiple networks.                                                                                                                                                                             |
 | REFRESH_INTERVAL | No       | 60                                    | Interval between checks for container changes (seconds).                                                                                                                                                                                                |
@@ -97,11 +99,10 @@ docker run -d \
 
 - [x] Eventual redundancy (Bind9 zone transfers to secondary)
 - [x] Support for multiple individual Docker servers
-- [ ] IPv6 support
+- [x] IPv6 support
 - [x] Detect hostname in decreasing order of priority:
     - label
     - Container name
-- [x] Forward-only
 - [ ] Clean up DNS (DNS is stateful but the script isn't, so there might be a mismatch)
 
 ### Nice to have
