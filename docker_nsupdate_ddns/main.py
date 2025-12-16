@@ -35,6 +35,8 @@ def check_required_vars(_config):
         'NAMESERVER',
         'PORT',
         'TSIG_NAME',
+        'TSIG_KEY',
+        'TSIG_ALGORITHM',
         'DOCKER_SOCKET',
         'HOSTNAME_LABEL',
         'IGNORE_LABEL',

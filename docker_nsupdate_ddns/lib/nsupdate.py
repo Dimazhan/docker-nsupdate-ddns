@@ -13,7 +13,7 @@ LOG = logging.getLogger(__name__)
 
 
 def add_records(records):
-    keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: config['TSIG_KEY']})
+    keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: (config['TSIG_ALGORITHM'], config['TSIG_KEY'])})
 
     for hostname, ip in records.items():
         delete_records({hostname:ip})
@@ -43,7 +43,7 @@ def add_records(records):
 
 
 def delete_records(records):
-    keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: config['TSIG_KEY']})
+    keyring = dns.tsigkeyring.from_text({config['TSIG_NAME']: (config['TSIG_ALGORITHM'], config['TSIG_KEY'])})
 
     for hostname, ip in records.items():
         if ip == None:
