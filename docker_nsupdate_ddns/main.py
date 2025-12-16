@@ -31,6 +31,7 @@ def main():
 def check_required_vars(_config):
     # Check for all required config
     required_vars = [
+        'LABEL_PREFIX',
         'DOMAIN',
         'NAMESERVER',
         'PORT',
@@ -40,8 +41,14 @@ def check_required_vars(_config):
         'DOCKER_SOCKET',
         'HOSTNAME_LABEL',
         'IGNORE_LABEL',
+        'IGNORE_IPV6_LABEL',
+        'IGNORE_IPV4_LABEL',
         'USE_LABEL',
+        'USE_IPV6_LABEL',
+        'USE_IPV4_LABEL',
         'DEFAULT_IGNORE',
+        'IGNORE_IPV6',
+        'IGNORE_IPV4',
         'DNS_RECORD_TTL',
         'DEFAULT_NETWORK',
         'REFRESH_INTERVAL',
@@ -69,6 +76,19 @@ def check_required_vars(_config):
     except Exception as e:
         LOG.error(f"Docker socket {_config['DOCKER_SOCKET']} not found.", e)
         raise e
+
+    # Concatenating a prefix to labels
+    labels = [
+        'HOSTNAME_LABEL',
+        'IGNORE_LABEL',
+        'IGNORE_IPV6_LABEL',
+        'IGNORE_IPV4_LABEL',
+        'USE_LABEL',
+        'USE_IPV6_LABEL',
+        'USE_IPV4_LABEL'
+    ]
+    for label in labels:
+        _config[label] = _config['LABEL_PREFIX'] + _config[label]
 
 
 def loop():

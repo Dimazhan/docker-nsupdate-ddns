@@ -11,38 +11,44 @@ The file name of the config file can be passed as argument, but defaults to `/co
 
 The names of the environment variables is the same as in the config file. Environment variables have precendence over the config file.
 
-| Config           | Required | Default Value                         | Description                                                                                                                                                                                                                                             |
-|------------------|----------|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| DOMAIN           | Yes      |                                       | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
-| REVERSE4_DOMAIN  | No       |                                       | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
-| REVERSE6_DOMAIN  | No       |                                       | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
-| NAMESERVER       | Yes      |                                       | Nameserver to push updates to.                                                                                                                                                                                                                          |
-| PORT             | No       |                                       | Nameserver port (default 53).                                                                                                                                                                                                                           |
-| TSIG_NAME        | Yes      |                                       | TSIG key name for secure updates.                                                                                                                                                                                                                       |
-| TSIG_KEY         | Yes      |                                       | TSIG key value for secure updates.                                                                                                                                                                                                                      |
-| TSIG_ALGORITHM   | No       | hmac-sha256                           | TSIG key algoritm for secure updates.                                                                                                                                                                                                                   |
-| DOCKER_SOCKET    | No       | /var/run/docker.sock                  | Sets the location of the Docker socket.                                                                                                                                                                                                                 |
-| HOSTNAME_LABEL   | No       | nl.mtak.docker-nsupdate-ddns.hostname | Docker label to override the default record name with. Use with `docker --label=nl.mtak.docker-nsupdate-ddns.hostname=nginx` to get `nginx.int.mtak.nl` _If the label value present on the container, use it as hostname otherwise the container name._ |
-| IGNORE_LABEL     | No       | nl.mtak.docker-nsupdate-ddns.ignore   | Container label to exclude containers from DNS updates.                                                                                                                                                                                                 |
-| USE_LABEL        | No       | nl.mtak.docker-nsupdate-ddns.use      | Container label to include containers for DNS updates.                                                                                                                                                                                                  |
-| DEFAULT_IGNORE   | No       | False                                 | Ignore container by default, if the USE_LABEL label is not specified.                                                                                                                                                                                   |
-| DNS_RECORD_TTL   | No       | 60                                    | Time to Live (TTL) for DNS records (seconds).                                                                                                                                                                                                           |
-| DEFAULT_NETWORK  | No       |                                       | Preferred network name to find IP for, in case there are multiple networks.                                                                                                                                                                             |
-| REFRESH_INTERVAL | No       | 60                                    | Interval between checks for container changes (seconds).                                                                                                                                                                                                |
-| ONE_SHOT         | No       | False                                 | Run once and exit instead of continuously monitoring.                                                                                                                                                                                                   |
-| CHECK_RECORDS    | No       | False                                 | Check DNS records.                                                                                                                                                                                                                                      |
+| Config           | Required | Default Value        | Description                                                                                                                                                                                                                                             |
+|------------------|----------|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DOMAIN           | Yes      |                      | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
+| REVERSE4_DOMAIN  | No       |                      | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
+| REVERSE6_DOMAIN  | No       |                      | Sets the domain in which the records are created. Needs to match the Bind zone.                                                                                                                                                                         |
+| NAMESERVER       | Yes      |                      | Nameserver to push updates to.                                                                                                                                                                                                                          |
+| PORT             | No       |                      | Nameserver port (default 53).                                                                                                                                                                                                                           |
+| TSIG_NAME        | Yes      |                      | TSIG key name for secure updates.                                                                                                                                                                                                                       |
+| TSIG_KEY         | Yes      |                      | TSIG key value for secure updates.                                                                                                                                                                                                                      |
+| TSIG_ALGORITHM   | No       | hmac-sha256          | TSIG key algoritm for secure updates.                                                                                                                                                                                                                   |
+| DOCKER_SOCKET    | No       | /var/run/docker.sock | Sets the location of the Docker socket.                                                                                                                                                                                                                 |
+| LABEL_PREFIX     | Yes      |                      | Container labels prefix.                                                                                                                                                                                                                                |
+| HOSTNAME_LABEL   | No       | hostname             | Docker label to override the default record name with. Use with `docker --label=nl.mtak.docker-nsupdate-ddns.hostname=nginx` to get `nginx.int.mtak.nl` _If the label value present on the container, use it as hostname otherwise the container name._ |
+| IGNORE_LABEL     | No       | ignore               | Container label to exclude containers from DNS updates.                                                                                                                                                                                                 |
+| IGNORE_IPV6_LABEL| No       | ignore_ipv6          | Container label to exclude container ipv6 address for DNS updates.                                                                                                                                                                                      |
+| IGNORE_IPV4_LABEL| No       | ignore_ipv4          | Container label to exclude container ipv4 address for DNS updates.                                                                                                                                                                                      |
+| USE_LABEL        | No       | use                  | Container label to include containers for DNS updates.                                                                                                                                                                                                  |
+| USE_IPV6_LABEL   | No       | use_ipv6             | Container label to include container ipv6 address for DNS updates.                                                                                                                                                                                      |
+| USE_IPV4_LABEL   | No       | use_ipv4             | Container label to include container ipv4 address for DNS updates.                                                                                                                                                                                      |
+| DEFAULT_IGNORE   | No       | False                | Ignore container by default, if the USE_LABEL label is not specified.                                                                                                                                                                                   |
+| IGNORE_IPV6      | No       | False                | Ignore containers ipv6 address by default.                                                                                                                                                                                                              |
+| IGNORE_IPV4      | No       | False                | Ignore containers ipv4 address by default.                                                                                                                                                                                                              |
+| DNS_RECORD_TTL   | No       | 60                   | Time to Live (TTL) for DNS records (seconds).                                                                                                                                                                                                           |
+| DEFAULT_NETWORK  | No       |                      | Preferred network name to find IP for, in case there are multiple networks.                                                                                                                                                                             |
+| REFRESH_INTERVAL | No       | 60                   | Interval between checks for container changes (seconds).                                                                                                                                                                                                |
+| ONE_SHOT         | No       | False                | Run once and exit instead of continuously monitoring.                                                                                                                                                                                                   |
+| CHECK_RECORDS    | No       | False                | Check DNS records.                                                                                                                                                                                                                                      |
 
 ### Environment variables
 ```bash
 docker run -d \
    -v /var/run/docker.sock:/var/run/docker.sock \
    -e DOMAIN=int.mtak.nl \
+   -e LABEL_PREFIX=nl.mtak.docker-nsupdate-ddns. \
    -e NAMESERVER=10.100.0.11 \
    -e TSIG_NAME=dck1 \
    -e TSIG_KEY=SyYXDCJ4kIs3qhvI= \
    -e DOCKER_SOCKET=/var/run/docker.sock \
-   -e HOSTNAME_LABEL=nl.mtak.docker-nsupdate-ddns.hostname \
-   -e IGNORE_LABEL=nl.mtak.docker-nsupdate-ddns.ignore \
    -e DNS_RECORD_TTL=60 \
    -e DEFAULT_NETWORK=10.100.0.192/26 \
    -e REFRESH_INTERVAL=60 \
@@ -53,13 +59,12 @@ docker run -d \
 ### Config file
 ```bash
 cat <<EOF > configfile
+LABEL_PREFIX=nl.mtak.docker-nsupdate-ddns.
 DOMAIN=int.mtak.nl
 NAMESERVER=10.100.0.11
 TSIG_NAME=dck1
 TSIG_KEY=SyYXDCJ4kIs3qhvI=
 DOCKER_SOCKET=/var/run/docker.sock
-HOSTNAME_LABEL=nl.mtak.docker-nsupdate-ddns.hostname
-IGNORE_LABEL=nl.mtak.docker-nsupdate-ddns.ignore
 DNS_RECORD_TTL=60
 DEFAULT_NETWORK=10.100.0.192/26
 REFRESH_INTERVAL=60

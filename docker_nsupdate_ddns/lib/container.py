@@ -57,14 +57,34 @@ def generate_container_list():
         if config['IGNORE_LABEL'] in container.attrs['Config']['Labels']:
             LOG.debug(f"Ignoring container {container.attrs['Name']} as ignore label present")
             continue
-        if eval(config['DEFAULT_IGNORE']) and not config['USE_LABEL'] in container.attrs['Config']['Labels']:
+
+        default_ignore = eval(config['DEFAULT_IGNORE'])
+        use_label = config['USE_LABEL'] in container.attrs['Config']['Labels']
+        use_ipv4_label = config['USE_IPV4_LABEL'] in container.attrs['Config']['Labels']
+        use_ipv6_label = config['USE_IPV6_LABEL'] in container.attrs['Config']['Labels']
+        if default_ignore and (not use_label) and (not use_ipv4_label) and (not use_ipv6_label):
             LOG.debug(f"Ignoring container {container.attrs['Name']} by use label not present")
             continue
+
+        ignore_ipv4 = eval(config['IGNORE_IPV4'])
+        ignore_ipv6 = eval(config['IGNORE_IPV6'])
+        ignore_ipv4_label = config['IGNORE_IPV4_LABEL'] in container.attrs['Config']['Labels']
+        ignore_ipv6_label = config['IGNORE_IPV6_LABEL'] in container.attrs['Config']['Labels']
 
         container_name = get_container_name(container)
         container_ip = get_container_ip(container)
         if container_ip:
-            ipam[container_name] = container_ip
+            result_ip = {}
+            for proto, addr in container_ip.items():
+                if default_ignore:
+                    if proto == 'IPv4' and (use_label and (not ignore_ipv4) or use_ipv4_label) or \
+                       proto == 'IPv6' and (use_label and (not ignore_ipv6) or use_ipv6_label):
+                        result_ip[proto] = addr
+                else:
+                    if proto == 'IPv4' and ((not ignore_ipv4_label) or ignore_ipv4 and (not use_ipv4_label)) or \
+                       proto == 'IPv6' and ((not ignore_ipv6_label) or ignore_ipv6 and (not use_ipv6_label)):
+                        result_ip[proto] = addr
+            ipam[container_name] = result_ip
 
     return ipam
 

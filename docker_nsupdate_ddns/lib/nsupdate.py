@@ -38,7 +38,14 @@ def add_records(records):
 
     for hostname, ip in records.items():
         delete_records({hostname:ip})
-        LOG.info(f"Adding record for {hostname}({ip['IPv4'], ip['IPv6']})")
+        s = ""
+        if 'IPv4' in ip:
+            s = s + ip['IPv4']
+        if 'IPv6' in ip:
+            if s != "":
+                s = s + ", "
+            s = s + ip['IPv6']
+        LOG.info(f"Adding records for {hostname}({s})")
 
         for proto, addr in ip.items():
             if proto == 'IPv4':
@@ -68,9 +75,16 @@ def delete_records(records):
 
     for hostname, ip in records.items():
         if ip == None:
-            LOG.info(f"Deleting record for {hostname}")
+            LOG.info(f"Deleting records for {hostname}")
         else:
-            LOG.info(f"Deleting record for {hostname}({ip['IPv4'], ip['IPv6']})")
+            s = ""
+            if 'IPv4' in ip:
+                s = s + ip['IPv4']
+            if 'IPv6' in ip:
+                if s != "":
+                    s = s + ", "
+                s = s + ip['IPv6']
+            LOG.info(f"Deleting records for {hostname}({s})")
 
         update = dns.update.Update(config['DOMAIN'], keyring=keyring)
         update.delete(hostname)
@@ -92,7 +106,6 @@ def delete_records(records):
 
 
 def check_records(hostname, ip):
-    ret = False
     for proto, addr in ip.items():
         if proto == 'IPv4':
             rrtype = dns.rdatatype.A
@@ -105,15 +118,14 @@ def check_records(hostname, ip):
             answers = resolver.resolve(target_domain, rrtype)
             for rdata in answers:
                 if str(rdata) == str(addr):
-                    ret = True
-                    break
+                    return True
         except dns.resolver.NoAnswer:
             LOG.error(f"No {proto} records found for {target_domain}")
         except dns.resolver.NXDOMAIN:
             LOG.error(f"Domain {target_domain} does not exist")
         except Exception as e:
             LOG.error(f"An error occurred: {e}")
-    return ret
+    return False
 
 
 def init(_config):
