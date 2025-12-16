@@ -6,10 +6,31 @@ import dns.rdatatype
 import dns.resolver
 import dns.reversename
 import dns.tsigkeyring
+import ipaddress
 
 config = {}
 
 LOG = logging.getLogger(__name__)
+
+
+def resolve_ip(name):
+    try:
+        ipaddress.ip_address(name)
+        return name
+    except ValueError:
+        pass
+    resolver = dns.resolver.Resolver()
+    try:
+        answers = resolver.resolve_name(name)
+        for rdatatype in answers:
+            for rdata in answers[rdatatype]:
+                return str(rdata)
+    except dns.resolver.NoAnswer:
+        LOG.error(f"No records found for {name}")
+    except dns.resolver.NXDOMAIN:
+        LOG.error(f"Domain {name} does not exist")
+    except Exception as e:
+        LOG.error(f"An error occurred: {e}")
 
 
 def add_records(records):
@@ -27,19 +48,19 @@ def add_records(records):
 
             update = dns.update.Update(config['DOMAIN'], keyring=keyring)
             update.add(hostname, int(config['DNS_RECORD_TTL']), rrtype, addr)
-            dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+            dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
             if proto == 'IPv4' and 'REVERSE4_DOMAIN' in config:
                 reventry = dns.reversename.from_address(addr)
                 update = dns.update.Update(config['REVERSE4_DOMAIN'], keyring=keyring)
                 update.add(reventry, int(config['DNS_RECORD_TTL']), dns.rdatatype.PTR, hostname + '.' + config['DOMAIN'] + '.')
-                dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+                dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
             if proto == 'IPv6' and 'REVERSE6_DOMAIN' in config:
                 reventry = dns.reversename.from_address(addr)
                 update = dns.update.Update(config['REVERSE6_DOMAIN'], keyring=keyring)
                 update.add(reventry, int(config['DNS_RECORD_TTL']), dns.rdatatype.PTR, hostname + '.' + config['DOMAIN'] + '.')
-                dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+                dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
 
 def delete_records(records):
@@ -53,7 +74,7 @@ def delete_records(records):
 
         update = dns.update.Update(config['DOMAIN'], keyring=keyring)
         update.delete(hostname)
-        dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+        dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
         if ip != None:
             for proto, addr in ip.items():
@@ -61,13 +82,13 @@ def delete_records(records):
                     reventry = dns.reversename.from_address(addr)
                     update = dns.update.Update(config['REVERSE4_DOMAIN'], keyring=keyring)
                     update.delete(reventry)
-                    dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+                    dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
                 if proto == 'IPv6' and 'REVERSE6_DOMAIN' in config:
                     reventry = dns.reversename.from_address(addr)
                     update = dns.update.Update(config['REVERSE6_DOMAIN'], keyring=keyring)
                     update.delete(reventry)
-                    dns.query.tcp(update, config['NAMESERVER'], timeout=2, port=int(config['PORT']))
+                    dns.query.tcp(update, resolve_ip(config['NAMESERVER']), timeout=2, port=int(config['PORT']))
 
 
 def check_records(hostname, ip):
@@ -85,6 +106,7 @@ def check_records(hostname, ip):
             for rdata in answers:
                 if str(rdata) == str(addr):
                     ret = True
+                    break
         except dns.resolver.NoAnswer:
             LOG.error(f"No {proto} records found for {target_domain}")
         except dns.resolver.NXDOMAIN:
